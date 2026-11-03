@@ -1,6 +1,7 @@
 module Domain.Transitions where
 
-import Data.List (groupBy, sortOn)
+import Data.List (groupBy, sortBy)
+import Data.Ord (comparing)
 import Domain.MusicLibrary
   ( MusicLibrary,
     TestedTransition (..),
@@ -30,7 +31,7 @@ bestTransitions ::
   [(Transition, Cost)] ->
   [(Transition, Cost)]
 bestTransitions ts =
-  case groupBy sameScore (sortOn snd ts) of
+  case groupBy sameScore (sortBy (comparing snd) ts) of
     [] -> []
     (xs : _) -> xs
   where
@@ -56,7 +57,7 @@ scoredNextTracks musicLibrary trackId =
 
 scoredTransitions :: MusicLibrary -> TrackId -> [(Transition, Cost)]
 scoredTransitions musicLibrary =
-  sortOn snd . scoreTransitions musicLibrary . transitions musicLibrary
+  sortBy (comparing snd) . scoreTransitions musicLibrary . transitions musicLibrary
 
 sameKeyTransitions :: MusicLibrary -> TrackId -> [Transition]
 sameKeyTransitions cat tid = map (Harmonic SameKey) (sameKeySuccessors tid cat)
