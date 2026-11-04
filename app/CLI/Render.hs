@@ -2,10 +2,11 @@ module CLI.Render where
 
 import App (ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..))
 import Data.Text (Text)
+import Data.Text qualified as T
 import Domain.MusicLibrary (TestedTransition (..), Track, TrackId)
 import Domain.Playlist (PlaylistMember (..))
 import Domain.Transitions (Transition (..))
-import Fmt (Builder, fmt, unlinesF, (+|), (|+))
+import Fmt (Builder, fmt, unlinesF, (+|), (+||), (|+), (||+))
 
 renderMusicLibrary :: [(TrackId, Track)] -> Text
 renderMusicLibrary lib =
@@ -13,30 +14,33 @@ renderMusicLibrary lib =
   where
     formatTrack :: (TrackId, Track) -> Builder
     formatTrack (trackId, track) =
-      "" +| trackId |+ ": " +| show track |+ ""
+      "" +| trackId |+ ": " +|| track ||+ ""
 
-renderTransition :: Transition -> String
-renderTransition (Tested i _) = "Tested (notes: " ++ notes ++ ")"
+renderTransition :: Transition -> Text
+renderTransition (Tested i _) =
+  fmt $ "Tested (notes: " +| notes |+ ")"
   where
     notes = case i.notes of
       Nothing -> "NA"
       Just msg -> msg
-renderTransition (Harmonic t _) = "Harmonic: " ++ show t
+renderTransition (Harmonic t _) = fmt $ "Harmonic: " +|| t ||+ ""
 
-renderPlaylistMember :: PlaylistMember -> String
+renderPlaylistMember :: PlaylistMember -> Text
 renderPlaylistMember (StartingTrack _) = "start"
 renderPlaylistMember (MiddleTrack t) = renderTransition t
 
-renderResolvedPlaylistMember :: ResolvedPlaylistMember -> String
+renderResolvedPlaylistMember :: ResolvedPlaylistMember -> Text
 renderResolvedPlaylistMember pm =
-  show (pm.track) ++ " - " ++ renderPlaylistMember (pm.playlistMember)
+  fmt $
+    "" +|| pm.track ||+ " - " +| renderPlaylistMember (pm.playlistMember) |+ ""
 
-renderResolvedPlaylist :: ResolvedPlaylist -> String
+renderResolvedPlaylist :: ResolvedPlaylist -> Text
 renderResolvedPlaylist =
-  unlines . map renderResolvedPlaylistMember
+  T.unlines . map renderResolvedPlaylistMember
 
-renderResolvedTransition :: ResolvedTransition -> String
-renderResolvedTransition rt = show rt.track ++ " (" ++ renderTransition rt.transition ++ ")"
+renderResolvedTransition :: ResolvedTransition -> Text
+renderResolvedTransition rt =
+  fmt $ "" +|| rt.track ||+ " (" +| renderTransition rt.transition |+ ")"
 
-renderResolvedTransitions :: [ResolvedTransition] -> String
-renderResolvedTransitions = unlines . map renderResolvedTransition
+renderResolvedTransitions :: [ResolvedTransition] -> Text
+renderResolvedTransitions = T.unlines . map renderResolvedTransition

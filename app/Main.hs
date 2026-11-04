@@ -174,7 +174,7 @@ handleMakePlaylist opts =
   handleExceptTFail do
     lib <- ExceptT $ readLibFromFile_ opts.libraryPath
     plist <- ExceptT $ mkPlaylist lib opts.firstTrack opts.maxTracks
-    liftIO $ putStr $ renderResolvedPlaylist plist
+    liftIO $ TIO.putStr $ renderResolvedPlaylist plist
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =
@@ -188,7 +188,7 @@ handleSuggestNextTracks o =
   handleExceptTFail do
     lib <- ExceptT $ readLibFromFile_ o.libraryPath
     ts <- ExceptT $ pure $ getTransitions lib o.track o.maxTracks
-    liftIO $ putStr $ renderResolvedTransitions ts
+    liftIO $ TIO.putStr $ renderResolvedTransitions ts
 
 {---------------------------------------------------------------------------
   Main
