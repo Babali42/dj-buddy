@@ -10,6 +10,7 @@ import CLI.Render
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Trans.Except (ExceptT (ExceptT), runExceptT)
 import Data.Text (Text)
+import Data.Text.IO qualified as TIO
 import Domain.Camelot (Key)
 import Domain.MusicLibrary (TrackId)
 import Options.Applicative
@@ -180,7 +181,7 @@ handleShowLibrary o =
   handleExceptTFail do
     lib <- ExceptT $ readLibFromFile_ o.libraryPath
     ts <- pure $ getTracks lib o.title o.key
-    liftIO $ putStr $ renderMusicLibrary ts
+    liftIO $ TIO.putStr $ renderMusicLibrary ts
 
 handleSuggestNextTracks :: SuggestNextTracksOptions -> IO ()
 handleSuggestNextTracks o =

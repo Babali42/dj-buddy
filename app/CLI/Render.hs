@@ -1,16 +1,19 @@
 module CLI.Render where
 
 import App (ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..))
+import Data.Text (Text)
 import Domain.MusicLibrary (TestedTransition (..), Track, TrackId)
 import Domain.Playlist (PlaylistMember (..))
 import Domain.Transitions (Transition (..))
+import Fmt (Builder, fmt, unlinesF, (+|), (|+))
 
-renderMusicLibrary :: [(TrackId, Track)] -> String
+renderMusicLibrary :: [(TrackId, Track)] -> Text
 renderMusicLibrary lib =
-  unlines $ map formatTrack $ lib
+  fmt $ unlinesF $ map formatTrack lib
   where
+    formatTrack :: (TrackId, Track) -> Builder
     formatTrack (trackId, track) =
-      show trackId ++ ": " ++ show track
+      "" +| trackId |+ ": " +| show track |+ ""
 
 renderTransition :: Transition -> String
 renderTransition (Tested i _) = "Tested (notes: " ++ notes ++ ")"
